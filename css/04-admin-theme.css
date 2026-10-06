@@ -1,0 +1,6 @@
+
+/* Admin entry shell only; existing component utility classes remain unchanged. */
+.admin-page .dashboard-content { scrollbar-gutter: stable; }
+.admin-page .dashboard-content::-webkit-scrollbar { width: 8px; }
+.admin-page .dashboard-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,.16); border-radius: 99px; }
+.admin-page .dashboard-sidebar { scrollbar-gutter: stable; }

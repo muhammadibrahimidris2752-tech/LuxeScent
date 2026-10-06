@@ -1,0 +1,32 @@
+/* ================================================================
+   FIXED APP CHROME
+   ================================================================ */
+/* ================================================================
+           FIXED APP CHROME (top header + bottom nav)
+           Headers and the bottom nav are `fixed` so they stay in place
+           while content scrolls underneath. Top bars get a translucent +
+           blurred background (frosted glass); browsers without
+           backdrop-filter support fall back to a more opaque solid tint
+           instead, so the bar stays legible either way.
+           ================================================================ */
+        .app-glass {
+            background-color: rgba(255, 255, 255, 0.75);
+        }
+        .app-glass-dark {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .app-glass { background-color: rgba(255, 255, 255, 0.94) !important; }
+            .app-glass-dark { background-color: rgba(0, 0, 0, 0.55) !important; }
+        }
+
+        /* Reserve space below the fixed desktop header for every view (the
+           global nav is fixed for all of them). Mobile clearance is handled
+           per-view with a pt-[72px] utility instead — home's hero is the
+           deliberate exception, since its header floats transparently over
+           the full-bleed image exactly as it did before this fix. */
+        @media (min-width: 768px) {
+            .view-section.active {
+                padding-top: 84px;
+            }
+        }

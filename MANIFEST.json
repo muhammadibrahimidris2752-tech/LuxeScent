@@ -1,0 +1,44 @@
+{
+  "project": "LuxeScents Modular Vanilla v5",
+  "entrypoints": {
+    "storefront": "index.html",
+    "admin": "admin/index.html"
+  },
+  "css": [
+    "css/00-base.css",
+    "css/01-ui.css",
+    "css/02-app-chrome.css",
+    "css/03-dashboard.css",
+    "css/04-admin-theme.css",
+    "css/05-settings.css"
+  ],
+  "js": [
+    "js/00-tailwind-config.js",
+    "js/01-data.js",
+    "js/02-state.js",
+    "js/03-storage.js",
+    "js/04-utils.js",
+    "js/05-navigation.js",
+    "js/06-modals.js",
+    "js/07-catalog-rendering.js",
+    "js/08-search.js",
+    "js/09-filters.js",
+    "js/10-product-details.js",
+    "js/11-wishlist.js",
+    "js/12-cart.js",
+    "js/13-checkout.js",
+    "js/14-orders.js",
+    "js/15-account-settings.js",
+    "js/16-campaign.js",
+    "js/17-dashboard.js",
+    "js/18-init-storefront.js",
+    "js/18-init-admin.js"
+  ],
+  "notes": [
+    "The storefront has no dashboard route or dashboard navigation entry.",
+    "The admin dashboard is standalone at admin/index.html.",
+    "Admin sidebar and main content are separate vertical scroll containers.",
+    "Product catalog entries contain no customer feedback fields.",
+    "Labels are definitions only; product assignment occurs in the product editor."
+  ]
+}

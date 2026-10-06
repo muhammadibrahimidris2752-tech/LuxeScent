@@ -1,0 +1,21 @@
+/* Settings toggles
+   Shared by the storefront settings screen and any admin surface that uses the same switch. */
+.settings-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    background: #e5e7eb;
+    border: 1px solid rgba(0,0,0,.06);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.settings-toggle[aria-checked="true"] { background: #1a1a1a; }
+.settings-toggle[aria-checked="false"] { background: #e5e7eb; }
+.settings-toggle .toggle-knob {
+    transition: transform .2s ease, box-shadow .2s ease;
+    transform: translateX(0);
+}
+.settings-toggle[aria-checked="true"] .toggle-knob { transform: translateX(1.25rem); }
+.settings-toggle:focus-visible { outline: 2px solid #cda077; outline-offset: 2px; }

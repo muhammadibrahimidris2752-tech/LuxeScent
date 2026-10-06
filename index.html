@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LuxeScents - Luxury Fragrances</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/00-tailwind-config.js"></script>
+    <link rel="stylesheet" href="css/00-base.css">
+    <link rel="stylesheet" href="css/01-ui.css">
+    <link rel="stylesheet" href="css/02-app-chrome.css">
+    <link rel="stylesheet" href="css/05-settings.css">
+</head>
+<body class="text-luxe-dark antialiased">
+    <div id="app-container">
+<div class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-luxe-dark text-white px-6 py-3 rounded-full shadow-lg z-[100] text-sm hidden transition-opacity duration-300" id="toast">
+            Added to wishlist
+        </div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-filter">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto no-scrollbar pb-24 md:pb-6 relative shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold">Filter &amp; Sort</h2>
+<button aria-label="Close filter and sort" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-filter')"><i class="fas fa-times text-xl"></i></button>
+</div>
+<div class="mb-6">
+<h3 class="font-semibold mb-3">Category</h3>
+<div class="flex flex-wrap gap-2">
+<button aria-pressed="true" class="chip-filter chip-category px-4 py-2 bg-luxe-dark text-white rounded-full text-sm hover:bg-black transition" data-value="All" onclick="selectFilterChip(this, 'category')" type="button">All</button>
+<button aria-pressed="false" class="chip-filter chip-category px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-value="Women" onclick="selectFilterChip(this, 'category')" type="button">Women</button>
+<button aria-pressed="false" class="chip-filter chip-category px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-value="Men" onclick="selectFilterChip(this, 'category')" type="button">Men</button>
+<button aria-pressed="false" class="chip-filter chip-category px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-value="Unisex" onclick="selectFilterChip(this, 'category')" type="button">Unisex</button>
+<button aria-pressed="false" class="chip-filter chip-category px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-value="Oud" onclick="selectFilterChip(this, 'category')" type="button">Oud</button>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="font-semibold mb-3">Price Range</h3>
+<div class="flex flex-wrap gap-2">
+<button aria-pressed="false" class="chip-filter chip-price px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-max="20000" data-min="0" onclick="selectFilterChip(this, 'price')" type="button">Under ₦20K</button>
+<button aria-pressed="false" class="chip-filter chip-price px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-max="50000" data-min="20000" onclick="selectFilterChip(this, 'price')" type="button">₦20K - ₦50K</button>
+<button aria-pressed="false" class="chip-filter chip-price px-4 py-2 border border-luxe-border rounded-full text-sm hover:bg-gray-50 transition" data-max="999999999" data-min="50000" onclick="selectFilterChip(this, 'price')" type="button">₦50K+</button>
+<button aria-pressed="true" class="chip-filter chip-price px-4 py-2 bg-gray-100 border-gray-300 border rounded-full text-sm font-medium" data-max="999999999" data-min="0" onclick="selectFilterChip(this, 'price')" type="button">Any Price</button>
+</div>
+</div>
+<div class="mb-6 flex flex-col md:flex-row md:gap-8">
+<div class="flex-1">
+<h3 class="font-semibold mb-3">Availability</h3>
+<div class="flex gap-4">
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700"><input checked="" class="accent-luxe-dark w-4 h-4 cursor-pointer" id="filter-chk-instock" onchange="updateAvailabilityFilter()" type="checkbox"/> In Stock</label>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700"><input class="accent-luxe-dark w-4 h-4 cursor-pointer" id="filter-chk-outofstock" onchange="updateAvailabilityFilter()" type="checkbox"/> Out of Stock</label>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="font-semibold mb-3">Sort By</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50"><input checked="" class="accent-luxe-dark w-4 h-4 cursor-pointer" name="sort" type="radio" value="featured"/> Featured</label>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50"><input class="accent-luxe-dark w-4 h-4 cursor-pointer" name="sort" type="radio" value="price-asc"/> Price: Low to High</label>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50"><input class="accent-luxe-dark w-4 h-4 cursor-pointer" name="sort" type="radio" value="price-desc"/> Price: High to Low</label>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50"><input class="accent-luxe-dark w-4 h-4 cursor-pointer" name="sort" type="radio" value="newest"/> Newest</label>
+</div>
+</div>
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 bg-white border-t md:border-none border-gray-100 md:p-0 md:mt-8">
+<button class="w-full bg-luxe-dark text-white py-4 rounded-xl font-semibold hover:bg-black transition-colors shadow-md" onclick="applyProductFilters()">Apply Filters</button>
+</div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-share">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-md mx-auto relative pb-8 md:pb-6 shadow-2xl">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-bold">Share this product</h2>
+<button aria-label="Close share dialog" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-share')"><i class="fas fa-times"></i></button>
+</div>
+<div class="flex items-center gap-4 mb-6 p-3 bg-gray-50 rounded-xl border border-gray-100">
+<img alt="Product" class="w-16 h-16 object-cover rounded-lg bg-white p-1" id="share-img" src=""/>
+<div>
+<h4 class="font-semibold text-sm md:text-base" id="share-title">Product Name</h4>
+<p class="text-xs md:text-sm text-luxe-gray" id="share-price">Price</p>
+</div>
+</div>
+<p class="text-sm text-gray-600 mb-6 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    Check out this amazing perfume!<br/>
+<span class="text-blue-500 hover:underline cursor-pointer block mt-1 truncate">https://luxescents.ng/product/...</span>
+</p>
+<div class="flex justify-between px-2 md:px-6">
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="closeModal('modal-share'); showToast('Opening WhatsApp')">
+<div class="w-12 h-12 md:w-14 md:h-14 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-xl md:text-2xl"><i class="fab fa-whatsapp"></i></div>
+<span class="text-xs font-medium">WhatsApp</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="closeModal('modal-share'); showToast('Opening Instagram')">
+<div class="w-12 h-12 md:w-14 md:h-14 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center text-xl md:text-2xl"><i class="fab fa-instagram"></i></div>
+<span class="text-xs font-medium">Instagram</span>
+</div>
+<div class="flex flex-col items-center gap-2 cursor-pointer hover:scale-105 transition-transform" onclick="closeModal('modal-share'); showToast('Link Copied!')">
+<div class="w-12 h-12 md:w-14 md:h-14 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-xl md:text-2xl hover:bg-gray-200"><i class="fas fa-link"></i></div>
+<span class="text-xs font-medium">Copy Link</span>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col items-center justify-center hidden p-4" id="modal-cart-success">
+<div class="modal-content bg-white rounded-3xl p-6 w-full max-w-[340px] md:max-w-md mx-auto relative text-center shadow-2xl">
+<button aria-label="Close" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-cart-success')"><i class="fas fa-times"></i></button>
+<div class="w-16 h-16 md:w-20 md:h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl md:text-4xl mx-auto mb-4 mt-2">
+<i class="fas fa-check"></i>
+</div>
+<h2 class="text-xl md:text-2xl font-bold mb-6">Added to Cart!</h2>
+<div class="flex items-center gap-4 mb-8 p-3 md:p-4 bg-gray-50 rounded-xl text-left border border-gray-100">
+<img alt="Product" class="w-14 h-14 md:w-16 md:h-16 object-cover rounded-lg bg-white p-1 shadow-sm" id="success-img" src=""/>
+<div>
+<h4 class="font-semibold text-sm md:text-base" id="success-title">Product Name</h4>
+<p class="text-xs md:text-sm text-luxe-gray mt-1" id="success-desc">Price - Size</p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-3">
+<button class="w-full sm:w-1/2 bg-gray-100 hover:bg-gray-200 text-luxe-dark py-3 md:py-4 rounded-xl font-semibold transition-colors order-2 sm:order-1" onclick="closeModal('modal-cart-success')">Keep Shopping</button>
+<button class="w-full sm:w-1/2 bg-luxe-dark hover:bg-black text-white py-3 md:py-4 rounded-xl font-semibold shadow-md transition-colors order-1 sm:order-2" onclick="closeModal('modal-cart-success'); navigateTo('view-cart')">View Cart</button>
+</div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-profile">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto no-scrollbar pb-24 md:pb-6 relative shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold">Profile Information</h2>
+<button aria-label="Close" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-profile')"><i class="fas fa-times text-xl"></i></button>
+</div>
+<div class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="profile-first-name">First Name</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="profile-first-name" type="text"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="profile-last-name">Last Name</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="profile-last-name" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="profile-email">Email</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="profile-email" type="email"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="profile-phone">Phone</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="profile-phone" type="tel"/>
+</div>
+<p class="text-red-500 text-xs md:text-sm hidden" id="profile-form-error"></p>
+</div>
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 bg-white border-t md:border-none border-gray-100 md:p-0 md:mt-8 flex gap-3">
+<button class="flex-1 bg-gray-100 hover:bg-gray-200 text-luxe-dark py-4 rounded-xl font-semibold transition-colors" onclick="closeModal('modal-profile')">Cancel</button>
+<button class="flex-1 bg-luxe-dark text-white py-4 rounded-xl font-semibold hover:bg-black transition-colors shadow-md" onclick="saveProfileForm()">Save Changes</button>
+</div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-addresses">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto no-scrollbar pb-6 relative shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold">Addresses</h2>
+<button aria-label="Close" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-addresses')"><i class="fas fa-times text-xl"></i></button>
+</div>
+<div class="space-y-3 mb-6" id="addresses-list"></div>
+<div class="hidden text-center py-8 text-gray-400 text-sm" id="addresses-empty">No saved addresses yet.</div>
+<button class="w-full border-2 border-dashed border-gray-200 hover:border-luxe-dark text-luxe-dark py-4 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2" onclick="openAddressForm()">
+<i class="fas fa-plus"></i> Add New Address
+                </button>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-address-form">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto no-scrollbar pb-24 md:pb-6 relative shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold" id="address-form-heading">Add Address</h2>
+<button aria-label="Close" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeAddressForm()"><i class="fas fa-times text-xl"></i></button>
+</div>
+<input id="addr-form-id" type="hidden" value=""/>
+<div class="space-y-4">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="addr-label">Label</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="addr-label" placeholder="e.g. Home, Office" type="text"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="addr-fullname">Full Name</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="addr-fullname" type="text"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="addr-phone">Phone</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="addr-phone" type="tel"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="addr-street">Street Address</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="addr-street" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="addr-city">City</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="addr-city" type="text"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="addr-state">State</label>
+<select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="addr-state">
+<option value="Kano">Kano</option>
+<option value="Lagos">Lagos</option>
+<option value="Abuja">Abuja</option>
+</select>
+</div>
+</div>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700">
+<input class="accent-luxe-dark w-4 h-4 cursor-pointer" id="addr-default" type="checkbox"/> Set as default address
+                    </label>
+<p class="text-red-500 text-xs md:text-sm hidden" id="address-form-error"></p>
+</div>
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 bg-white border-t md:border-none border-gray-100 md:p-0 md:mt-8 flex gap-3">
+<button class="flex-1 bg-gray-100 hover:bg-gray-200 text-luxe-dark py-4 rounded-xl font-semibold transition-colors" onclick="closeAddressForm()">Cancel</button>
+<button class="flex-1 bg-luxe-dark text-white py-4 rounded-xl font-semibold hover:bg-black transition-colors shadow-md" onclick="saveAddressForm()">Save Address</button>
+</div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-change-password">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-md mx-auto relative pb-8 md:pb-6 shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold">Change Password</h2>
+<button aria-label="Close" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-change-password')"><i class="fas fa-times text-xl"></i></button>
+</div>
+<div class="space-y-4">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="pwd-current">Current Password</label>
+<input autocomplete="current-password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="pwd-current" type="password"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="pwd-new">New Password</label>
+<input autocomplete="new-password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="pwd-new" type="password"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="pwd-confirm">Confirm New Password</label>
+<input autocomplete="new-password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="pwd-confirm" type="password"/>
+</div>
+<p class="text-red-500 text-xs md:text-sm hidden" id="pwd-form-error"></p>
+<p class="text-gray-400 text-xs">This updates your session only and isn't sent to a server.</p>
+</div>
+<button class="w-full mt-6 bg-luxe-dark text-white py-4 rounded-xl font-semibold hover:bg-black transition-colors shadow-md" onclick="savePasswordForm()">Update Password</button>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-info">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto no-scrollbar pb-8 md:pb-6 relative shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold" id="info-modal-heading">About Us</h2>
+<button aria-label="Close" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-info')"><i class="fas fa-times text-xl"></i></button>
+</div>
+<div class="text-sm md:text-base text-gray-600 leading-relaxed space-y-4" id="info-modal-body"></div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[60] bg-black bg-opacity-50 flex-col items-center justify-center hidden p-4" id="modal-signout-confirm">
+<div class="modal-content bg-white rounded-3xl p-6 w-full max-w-[340px] md:max-w-md mx-auto relative text-center shadow-2xl">
+<div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-5">
+<i class="fas fa-sign-out-alt"></i>
+</div>
+<h2 class="text-xl font-bold mb-2">Sign out?</h2>
+<p class="text-gray-500 text-sm mb-6">You can sign back in anytime. Your cart and wishlist stay saved on this device.</p>
+<div class="flex gap-3">
+<button class="flex-1 bg-gray-100 hover:bg-gray-200 text-luxe-dark py-4 rounded-xl font-semibold transition-colors" onclick="closeModal('modal-signout-confirm')">Cancel</button>
+<button class="flex-1 bg-red-500 text-white py-4 rounded-xl font-semibold hover:bg-red-600 transition-colors shadow-md" onclick="confirmSignOut()">Sign Out</button>
+</div>
+</div>
+</div>
+
+<nav class="hidden md:flex w-full bg-white/80 backdrop-blur-xl text-luxe-dark items-center justify-between px-8 lg:px-16 py-5 border-b border-gray-100 fixed top-0 inset-x-0 z-50 shadow-sm app-glass" id="global-desktop-nav">
+<h1 class="font-serif text-2xl lg:text-3xl font-bold cursor-pointer tracking-wider" onclick="navigateTo('view-home')">LuxeScents</h1>
+<div class="flex items-center gap-8 lg:gap-12 font-medium text-sm lg:text-base">
+<button class="nav-desk-btn text-luxe-dark hover:text-luxe-gold transition-colors" data-target="view-home" onclick="navigateTo('view-home')">Home</button>
+<button class="nav-desk-btn text-gray-400 hover:text-luxe-gold transition-colors" data-target="view-categories" onclick="navigateTo('view-categories')">Shop</button>
+<button class="nav-desk-btn text-gray-400 hover:text-luxe-gold transition-colors" data-target="view-campaign" onclick="navigateTo('view-campaign')">Collections</button>
+<button class="nav-desk-btn text-gray-400 hover:text-luxe-gold transition-colors" data-target="view-wishlist" onclick="navigateTo('view-wishlist')">Wishlist</button>
+</div>
+<div class="flex items-center gap-6 lg:gap-8 text-xl">
+<button aria-label="View cart" class="relative hover:text-luxe-gold transition-colors group" onclick="navigateTo('view-cart')">
+<i class="fas fa-shopping-bag"></i>
+<span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center hidden border-2 border-white group-hover:border-gray-50 transition-colors">0</span>
+</button>
+<button aria-label="My account" class="hover:text-luxe-gold transition-colors nav-desk-btn" data-target="view-account" onclick="navigateTo('view-account')">
+<i class="far fa-user"></i>
+</button>
+</div>
+</nav>
+
+<div class="view-section active pb-20 md:pb-0 overflow-y-auto overflow-x-hidden" id="view-home">
+<!-- Mobile Header (hidden on md) -->
+<div class="fixed top-0 inset-x-0 p-5 flex justify-between items-center z-40 text-white md:hidden bg-black/20 backdrop-blur-xl app-glass-dark">
+<h1 class="font-serif text-2xl font-bold tracking-wider">LuxeScents</h1>
+<div class="flex gap-5">
+<button aria-label="Search" onclick="navigateTo('view-categories')"><i class="fas fa-search text-xl"></i></button>
+<button aria-label="View cart" class="relative" onclick="navigateTo('view-cart')">
+<i class="fas fa-shopping-bag text-xl"></i>
+<span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center hidden border border-transparent">0</span>
+</button>
+</div>
+</div>
+<!-- Hero Banner -->
+<div class="relative h-[65vh] md:h-[80vh] bg-black overflow-hidden">
+<img alt="Luxury Perfume" class="w-full h-full object-cover opacity-60" loading="eager" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&amp;fit=crop&amp;w=1600&amp;q=80"/>
+<!-- Decorative atmosphere layers: depth + warm glass glow. Purely visual, non-interactive, no layout impact. -->
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+<div aria-hidden="true" class="absolute inset-0 bg-gradient-to-tr from-luxe-gold/10 via-transparent to-transparent pointer-events-none"></div>
+<div aria-hidden="true" class="absolute -bottom-10 -left-10 w-64 h-64 md:w-96 md:h-96 bg-luxe-gold/20 rounded-full blur-3xl pointer-events-none"></div>
+<div aria-hidden="true" class="absolute inset-0 pointer-events-none" style="box-shadow: inset 0 -90px 140px -40px rgba(0,0,0,0.65), inset 0 90px 140px -60px rgba(0,0,0,0.35);"></div>
+<div class="absolute bottom-10 md:bottom-20 left-6 right-6 md:left-16 md:right-16 text-white max-w-4xl">
+<span class="hidden md:inline-block px-3 py-1 bg-luxe-gold text-white text-xs font-bold tracking-widest uppercase rounded-full mb-4">New Collection</span>
+<h2 class="font-serif text-4xl md:text-6xl lg:text-7xl mb-4 md:mb-6 leading-tight drop-shadow-lg">Timeless Scents<br/>Unforgettable Moments</h2>
+<p class="text-sm md:text-lg text-gray-200 mb-8 w-4/5 md:w-2/3 max-w-2xl leading-relaxed">Discover a world of luxury fragrances meticulously crafted for every mood, occasion, and distinct personality.</p>
+<button class="bg-[#cda077] text-white px-8 py-4 md:px-10 md:py-4 rounded-full font-semibold text-sm md:text-base hover:bg-[#b88c63] transition-all transform hover:scale-105 shadow-[0_10px_20px_rgba(205,160,119,0.3)]" onclick="navigateTo('view-categories')">Shop Collection <i class="fas fa-arrow-right ml-2"></i></button>
+</div>
+</div>
+<!-- Featured Section -->
+<div class="p-6 md:px-16 md:py-16 max-w-screen-2xl mx-auto w-full">
+<div class="flex justify-between items-end mb-6 md:mb-10">
+<div>
+<h3 class="font-bold text-lg md:text-3xl font-serif">Featured This Week</h3>
+<p class="text-xs md:text-base text-luxe-gray mt-1 md:mt-2">Our most loved perfumes</p>
+</div>
+<button class="text-sm md:text-base font-medium text-luxe-dark hover:text-luxe-gold transition-colors pb-1 border-b-2 border-transparent hover:border-luxe-gold" onclick="navigateTo('view-product-listing')">View All</button>
+</div>
+<div class="flex gap-4 md:gap-8 overflow-x-auto md:grid md:grid-cols-4 lg:grid-cols-4 no-scrollbar pb-6 md:pb-0" id="home-featured-grid">
+<!-- Populated by JS -->
+</div>
+</div>
+<!-- Desktop Footer (Simple) -->
+<footer class="hidden md:block bg-gray-50 border-t border-gray-100 py-12 px-16 mt-auto">
+<div class="max-w-screen-2xl mx-auto grid grid-cols-4 gap-8">
+<div>
+<h2 class="font-serif text-2xl font-bold mb-4">LuxeScents</h2>
+<p class="text-sm text-gray-500 leading-relaxed">Elevating your everyday with the world's most exquisite and rare fragrances.</p>
+</div>
+<div>
+<h4 class="font-bold mb-4">Shop</h4>
+<ul class="space-y-2 text-sm text-gray-500">
+<li><button class="hover:text-black transition" onclick="navigateTo('view-product-listing', 'Women')">Women</button></li>
+<li><button class="hover:text-black transition" onclick="navigateTo('view-product-listing', 'Men')">Men</button></li>
+<li><button class="hover:text-black transition" onclick="navigateTo('view-product-listing', 'Unisex')">Unisex</button></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-4">Support</h4>
+<ul class="space-y-2 text-sm text-gray-500">
+<li><a class="hover:text-black transition" href="#">Contact Us</a></li>
+<li><a class="hover:text-black transition" href="#">FAQs</a></li>
+<li><a class="hover:text-black transition" href="#">Shipping</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-4">Follow Us</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:text-luxe-gold transition hover:border-luxe-gold shadow-sm" href="#"><i class="fab fa-instagram"></i></a>
+<a class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:text-luxe-gold transition hover:border-luxe-gold shadow-sm" href="#"><i class="fab fa-twitter"></i></a>
+<a class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:text-luxe-gold transition hover:border-luxe-gold shadow-sm" href="#"><i class="fab fa-facebook-f"></i></a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto overflow-x-hidden" id="view-categories">
+<!-- Mobile Header -->
+<div class="p-4 flex justify-between items-center bg-white/75 backdrop-blur-xl fixed top-0 inset-x-0 z-40 md:hidden border-b border-gray-100 app-glass">
+<h1 class="font-serif text-xl font-bold">Discover</h1>
+<button aria-label="View cart" class="relative hover:text-gray-600 transition-colors" onclick="navigateTo('view-cart')">
+<i class="fas fa-shopping-bag text-lg"></i>
+<span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+</button>
+</div>
+<div class="p-4 md:px-16 md:py-12 max-w-screen-2xl mx-auto w-full">
+<!-- Search Bar -->
+<div class="relative mb-6 md:mb-12 max-w-3xl mx-auto">
+<i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 md:text-xl"></i>
+<input aria-label="Search for brands, notes, or perfumes" class="w-full bg-gray-50 border border-gray-100 rounded-full py-4 md:py-5 pl-12 md:pl-14 pr-6 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-luxe-gold transition-shadow shadow-sm" id="catalog-search-input" oninput="handleSearchInput(this.value)" placeholder="Search for brands, notes, or perfumes..." type="text"/>
+<button aria-label="Clear search" class="hidden absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 w-8 h-8 rounded-full flex items-center justify-center" id="catalog-search-clear" onclick="clearSearchInput()" type="button"><i class="fas fa-times-circle"></i></button>
+</div>
+<!-- Search Results (shown only while searching; hidden by default) -->
+<div class="hidden mb-8 md:mb-12" id="categories-search-results">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-lg md:text-2xl font-serif">Results for “<span id="search-results-query"></span>”</h3>
+<span class="text-sm md:text-base text-luxe-gray"><span id="search-results-count">0</span> found</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8" id="search-results-grid"></div>
+<div class="hidden flex-col items-center justify-center py-20 text-center" id="search-results-empty">
+<div class="w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-full flex items-center justify-center text-3xl md:text-4xl text-gray-300 mb-5 mx-auto">
+<i class="fas fa-search"></i>
+</div>
+<h4 class="text-xl md:text-2xl font-serif font-bold mb-2">No fragrances found</h4>
+<p class="text-gray-500 md:text-lg">Try a different name, brand, or note.</p>
+</div>
+</div>
+<!-- Browse by Category (hidden while searching) -->
+<div id="categories-browse-section">
+<!-- Featured Banner -->
+<div class="relative rounded-2xl md:rounded-3xl overflow-hidden h-32 md:h-72 mb-8 md:mb-12 cursor-pointer group shadow-md" onclick="navigateTo('view-campaign')">
+<img alt="Curated collections banner" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"/>
+<div class="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center p-6 md:p-12 text-white">
+<span class="text-xs md:text-sm font-bold tracking-widest uppercase mb-2 md:mb-4 text-luxe-gold">Curated For You</span>
+<h2 class="font-serif text-xl md:text-4xl lg:text-5xl mb-1 md:mb-3 font-bold">Explore Our Collections</h2>
+<p class="text-xs md:text-lg text-gray-200">Find your perfect signature scent today.</p>
+</div>
+</div>
+<h3 class="font-bold text-lg md:text-2xl font-serif mb-6 md:mb-8">Shop by Category</h3>
+<div class="grid grid-cols-3 md:grid-cols-6 gap-y-6 md:gap-y-10 gap-x-4 md:gap-x-8">
+<!-- Category Item -->
+<div class="flex flex-col items-center cursor-pointer group" onclick="navigateTo('view-product-listing', 'Women')">
+<div class="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden bg-pink-50 mb-3 md:mb-4 border border-pink-100 flex items-center justify-center group-hover:shadow-lg transition-all group-hover:-translate-y-1">
+<img alt="Shop Women's fragrances" class="h-16 md:h-24 object-cover mix-blend-multiply transition-transform group-hover:scale-110" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&amp;fit=crop&amp;w=300&amp;q=80"/>
+</div>
+<span class="text-xs md:text-base text-center font-medium group-hover:text-luxe-gold transition-colors">Women</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center cursor-pointer group" onclick="navigateTo('view-product-listing', 'Men')">
+<div class="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden bg-blue-50 mb-3 md:mb-4 border border-blue-100 flex items-center justify-center group-hover:shadow-lg transition-all group-hover:-translate-y-1">
+<img alt="Shop Men's fragrances" class="h-16 md:h-24 object-cover mix-blend-multiply transition-transform group-hover:scale-110" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&amp;fit=crop&amp;w=300&amp;q=80"/>
+</div>
+<span class="text-xs md:text-base text-center font-medium group-hover:text-luxe-gold transition-colors">Men</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center cursor-pointer group" onclick="navigateTo('view-product-listing', 'Unisex')">
+<div class="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden bg-green-50 mb-3 md:mb-4 border border-green-100 flex items-center justify-center group-hover:shadow-lg transition-all group-hover:-translate-y-1">
+<img alt="Shop Unisex fragrances" class="h-16 md:h-24 object-cover mix-blend-multiply transition-transform group-hover:scale-110" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1615529328331-f8917597711f?auto=format&amp;fit=crop&amp;w=300&amp;q=80"/>
+</div>
+<span class="text-xs md:text-base text-center font-medium group-hover:text-luxe-gold transition-colors">Unisex</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center cursor-pointer group" onclick="navigateTo('view-product-listing', 'Oud')">
+<div class="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden bg-amber-50 mb-3 md:mb-4 border border-amber-100 flex items-center justify-center group-hover:shadow-lg transition-all group-hover:-translate-y-1">
+<img alt="Shop Oud &amp; Arabic fragrances" class="h-16 md:h-24 object-cover mix-blend-multiply transition-transform group-hover:scale-110" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&amp;fit=crop&amp;w=300&amp;q=80"/>
+</div>
+<span class="text-xs md:text-base text-center font-medium group-hover:text-luxe-gold transition-colors">Oud &amp; Arabic</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center cursor-pointer group" onclick="navigateTo('view-product-listing', 'Gifts')">
+<div class="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden bg-red-50 mb-3 md:mb-4 border border-red-100 flex items-center justify-center group-hover:shadow-lg transition-all group-hover:-translate-y-1">
+<img alt="Shop Gift Sets" class="h-16 md:h-24 object-cover mix-blend-multiply transition-transform group-hover:scale-110" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=300&amp;q=80"/>
+</div>
+<span class="text-xs md:text-base text-center font-medium group-hover:text-luxe-gold transition-colors">Gift Sets</span>
+</div>
+<!-- Category Item -->
+<div class="flex flex-col items-center cursor-pointer group" onclick="navigateTo('view-product-listing', 'Best')">
+<div class="w-20 h-20 md:w-32 md:h-32 rounded-full overflow-hidden bg-purple-50 mb-3 md:mb-4 border border-purple-100 flex items-center justify-center group-hover:shadow-lg transition-all group-hover:-translate-y-1">
+<img alt="Shop Best Sellers" class="h-16 md:h-24 object-cover mix-blend-multiply transition-transform group-hover:scale-110" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1622618991746-fe6004db3a47?auto=format&amp;fit=crop&amp;w=300&amp;q=80"/>
+</div>
+<span class="text-xs md:text-base text-center font-medium group-hover:text-luxe-gold transition-colors">Best Sellers</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto overflow-x-hidden bg-white" id="view-product-listing">
+<div class="p-4 md:px-16 md:py-8 flex justify-between items-center bg-white/75 backdrop-blur-xl md:bg-white fixed md:static inset-x-0 top-0 z-40 border-b border-gray-100 max-w-screen-2xl mx-auto w-full app-glass md:backdrop-blur-none">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-lg md:text-3xl font-bold" id="listing-title">Women's Fragrances</h1>
+</div>
+<button aria-label="View cart" class="relative text-xl md:hidden" onclick="navigateTo('view-cart')">
+<i class="fas fa-shopping-bag"></i>
+<span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+</button>
+</div>
+<div class="px-4 md:px-16 py-4 flex justify-between items-center text-sm md:text-base text-luxe-gray max-w-screen-2xl mx-auto w-full">
+<span>Showing <span class="font-medium text-black" id="listing-count">12</span> products</span>
+<button class="flex items-center gap-2 font-medium text-luxe-dark hover:text-luxe-gold transition px-4 py-2 border border-gray-200 rounded-full md:hover:bg-gray-50" onclick="openFilterModal()">
+<i class="fas fa-sliders-h text-xs hidden md:inline"></i> Sort &amp; Filter <i class="fas fa-chevron-down text-[10px] ml-1"></i>
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8 px-4 md:px-16 pb-6 max-w-screen-2xl mx-auto w-full" id="product-listing-grid">
+<!-- Populated by JS -->
+</div>
+<div class="hidden flex-col items-center justify-center py-24 px-6 text-center max-w-screen-2xl mx-auto w-full" id="listing-empty-state">
+<div class="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-full flex items-center justify-center text-4xl md:text-6xl text-gray-300 mb-6 mx-auto">
+<i class="fas fa-sliders-h"></i>
+</div>
+<h2 class="text-2xl md:text-3xl font-serif font-bold mb-3">No fragrances match</h2>
+<p class="text-gray-500 mb-8 md:text-lg max-w-md mx-auto">Try adjusting or clearing your filters.</p>
+<button class="bg-luxe-dark text-white px-8 md:px-12 py-4 rounded-full font-bold md:text-lg shadow-lg hover:bg-black transition-colors" onclick="resetProductFilters()">Clear Filters</button>
+</div>
+</div>
+
+<div class="view-section bg-white md:bg-gray-50 overflow-y-auto overflow-x-hidden" id="view-product-details">
+<div class="md:max-w-7xl md:mx-auto md:w-full md:p-8 lg:p-12 md:flex md:gap-8 lg:gap-16 pb-24 md:pb-12 h-full">
+<!-- Image Side -->
+<div class="relative h-[55vh] md:h-auto md:flex-1 md:rounded-3xl overflow-hidden bg-pink-100 md:min-h-[500px] lg:min-h-[600px] shadow-inner" id="pd-image-bg">
+<!-- Mobile Actions -->
+<div class="absolute top-4 left-4 right-4 flex justify-between z-10 md:hidden">
+<button aria-label="Go back" class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-sm" onclick="goBack()"><i class="fas fa-chevron-left text-lg"></i></button>
+<div class="flex gap-2">
+<button aria-label="Share this product" class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-sm" onclick="openModal('modal-share')"><i class="fas fa-share-alt text-lg"></i></button>
+<button aria-label="Add to wishlist" class="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-sm text-gray-400" id="pd-wishlist-btn-mobile"><i class="fas fa-heart text-lg"></i></button>
+</div>
+</div>
+<!-- Desktop Back Button Overlay -->
+<button aria-label="Go back" class="hidden md:flex absolute top-6 left-6 w-12 h-12 bg-white bg-opacity-90 rounded-full items-center justify-center shadow-md hover:bg-white transition-colors z-10" onclick="goBack()"><i class="fas fa-chevron-left text-xl"></i></button>
+<img alt="Product" class="w-full h-full object-contain mix-blend-multiply p-8 md:p-16 hover:scale-105 transition-transform duration-500" id="pd-image" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src=""/>
+</div>
+<!-- Details Side -->
+<div class="bg-white rounded-t-3xl -mt-6 md:mt-0 p-6 md:p-10 relative z-10 flex-1 flex flex-col md:rounded-3xl md:shadow-lg border border-gray-50 md:border-none">
+<!-- Desktop Actions -->
+<div class="hidden md:flex justify-end gap-3 mb-6">
+<button class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shadow-sm hover:bg-gray-100 transition tooltip-trigger" onclick="openModal('modal-share')" title="Share"><i class="fas fa-share-alt text-lg"></i></button>
+<button aria-label="Add to wishlist" class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shadow-sm text-gray-400 hover:bg-gray-100 transition tooltip-trigger" id="pd-wishlist-btn-desk" title="Wishlist"><i class="fas fa-heart text-lg"></i></button>
+</div>
+<p class="text-sm md:text-base text-luxe-gold font-bold uppercase tracking-wider mb-2" id="pd-brand">Brand</p>
+<h1 class="font-serif text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-luxe-dark" id="pd-title">Product Title</h1>
+<div class="font-bold text-3xl md:text-4xl lg:text-5xl mb-6 text-luxe-dark tracking-tight" id="pd-price">₦ 0</div>
+<div class="flex flex-wrap gap-2 mb-8" id="pd-tags">
+<!-- Populated by JS from the active product's tags -->
+</div>
+<h3 class="font-bold text-lg mb-3">About the Scent</h3>
+<p class="text-sm md:text-base text-gray-600 mb-8 leading-relaxed" id="pd-desc">
+                        Description goes here...
+                    </p>
+<div class="mb-8 mt-auto pt-6 border-t border-gray-100">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-base md:text-lg">Select Size</h3>
+<a class="text-xs md:text-sm text-gray-400 underline hover:text-black" href="#">Size Guide</a>
+</div>
+<div class="flex gap-3 flex-wrap" id="pd-sizes">
+<!-- Populated by JS: one button per product.sizes, click to select -->
+</div>
+</div>
+<div class="flex items-center gap-2 text-sm md:text-base text-green-600 mb-6 font-medium bg-green-50 w-max px-4 py-2 rounded-lg" id="pd-stock-badge">
+<i class="fas fa-circle text-[8px] animate-pulse"></i> In Stock &amp; Ready to Ship
+                    </div>
+<!-- Product quantity + actions -->
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 md:p-0 bg-white md:bg-transparent border-t md:border-none border-gray-100 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] md:shadow-none">
+<div class="flex items-center justify-between gap-3 mb-3">
+<span class="font-semibold text-sm md:text-base">Quantity</span>
+<div class="inline-flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-2 py-1.5">
+<button aria-label="Decrease quantity" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 transition text-lg" id="pd-qty-minus" onclick="changeProductDetailQuantity(-1)" type="button">−</button>
+<span class="w-8 text-center font-bold" id="pd-qty-value">1</span>
+<button aria-label="Increase quantity" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 transition text-lg" id="pd-qty-plus" onclick="changeProductDetailQuantity(1)" type="button">+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="w-full bg-white text-luxe-dark border border-luxe-dark py-4 md:py-5 rounded-xl font-bold md:text-lg hover:bg-gray-50 transition-all" id="pd-add-cart-btn">Add to Cart</button>
+<button class="w-full bg-luxe-dark text-white py-4 md:py-5 rounded-xl font-bold md:text-lg shadow-xl hover:bg-black transition-all" id="pd-buy-now-btn">Buy Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="view-section pt-[72px] overflow-y-auto overflow-x-hidden bg-gray-50" id="view-cart">
+<div class="max-w-4xl mx-auto w-full min-h-screen flex flex-col relative pb-24 md:pb-12 pt-0 md:pt-8">
+<div class="p-4 md:px-0 flex justify-between items-center bg-white/75 backdrop-blur-xl md:bg-transparent fixed md:static inset-x-0 top-0 z-40 md:mb-6 app-glass md:backdrop-blur-none">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-gray-100 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-2xl md:text-3xl font-bold">Your Cart (<span id="cart-header-count">0</span>)</h1>
+</div>
+<button class="text-sm md:text-base font-medium text-red-500 hover:text-red-700 bg-red-50 px-4 py-2 rounded-full transition" onclick="clearCart()">Clear All</button>
+</div>
+<div class="p-4 md:p-0 flex-1 w-full" id="cart-items-container">
+<!-- Cart items injected here -->
+</div>
+<!-- Footer Summary (Fixed on mobile, static on desktop) -->
+<div class="fixed md:static bottom-0 left-0 right-0 bg-white md:bg-transparent border-t md:border-none border-gray-200 z-20 w-full" id="cart-footer">
+<div class="p-5 md:p-8 md:bg-white md:rounded-3xl md:shadow-lg md:mt-8">
+<div class="flex justify-between items-center mb-6">
+<span class="text-luxe-gray font-medium md:text-lg">Subtotal</span>
+<span class="font-bold text-xl md:text-3xl" id="cart-subtotal">₦ 0</span>
+</div>
+<p class="text-xs md:text-sm text-gray-500 mb-6 text-center">Taxes and shipping calculated at checkout</p>
+<button class="w-full bg-luxe-dark text-white py-4 md:py-5 rounded-xl md:rounded-2xl font-bold md:text-lg shadow-xl hover:bg-black transition-colors" onclick="navigateTo('view-checkout')">Proceed to Checkout</button>
+</div>
+</div>
+<div class="hidden flex-col items-center justify-center h-full p-6 text-center my-auto md:bg-white md:rounded-3xl md:shadow-sm md:py-20" id="cart-empty-state">
+<div class="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-full flex items-center justify-center text-4xl md:text-6xl text-gray-300 mb-6 mx-auto">
+<i class="fas fa-shopping-bag"></i>
+</div>
+<h2 class="text-2xl md:text-3xl font-serif font-bold mb-3">Your cart is empty</h2>
+<p class="text-gray-500 mb-8 md:text-lg max-w-md mx-auto">Looks like you haven't added any luxury fragrances to your cart yet.</p>
+<button class="bg-luxe-dark text-white px-8 md:px-12 py-4 md:py-4 rounded-full font-bold md:text-lg shadow-lg hover:bg-black transition-colors" onclick="navigateTo('view-home')">Start Shopping</button>
+</div>
+</div>
+</div>
+
+<div class="view-section pt-[72px] overflow-y-auto overflow-x-hidden bg-gray-50" id="view-checkout">
+<div class="max-w-3xl mx-auto w-full flex flex-col relative pb-24 md:pb-12 pt-0 md:pt-8 min-h-screen">
+<div class="p-4 md:px-0 flex items-center gap-4 bg-white/75 backdrop-blur-xl md:bg-transparent fixed md:static inset-x-0 top-0 z-40 md:mb-6 app-glass md:backdrop-blur-none">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-gray-100 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-2xl md:text-3xl font-bold">Checkout</h1>
+</div>
+<div class="p-4 md:p-8 md:bg-white md:rounded-3xl md:shadow-sm">
+<h2 class="font-bold text-lg md:text-xl mb-4 border-b border-gray-100 pb-3">1. Customer Information</h2>
+<div class="space-y-4 mb-10">
+<div class="grid md:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-first-name">First Name</label>
+<input class="checkout-field w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="co-first-name" type="text" value="Jane"/>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-last-name">Last Name</label>
+<input class="checkout-field w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="co-last-name" type="text" value="Doe"/>
+</div>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-phone">Phone Number</label>
+<input class="checkout-field w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="co-phone" type="tel" value="+234 801 234 5678"/>
+</div>
+</div>
+<h2 class="font-bold text-lg md:text-xl mb-4 border-b border-gray-100 pb-3">2. Delivery Address</h2>
+<div class="space-y-4 mb-6">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-street">Street Address</label>
+<input class="checkout-field w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="co-street" type="text" value="12 Crescent Street, Kano"/>
+</div>
+<div class="grid md:grid-cols-2 gap-4">
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-state">State / Region</label>
+<div class="relative">
+<select class="checkout-field w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base appearance-none focus:outline-none focus:border-luxe-dark focus:bg-white transition cursor-pointer" id="co-state">
+<option>Kano</option>
+<option>Lagos</option>
+<option>Abuja</option>
+</select>
+<i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+</div>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-city">City</label>
+<input class="checkout-field w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="co-city" type="text" value="Nassarawa"/>
+</div>
+</div>
+<div>
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="co-note">Additional Note (Optional)</label>
+<textarea class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-4 text-sm md:text-base h-24 md:h-32 resize-none focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="co-note" placeholder="E.g. Gate code, delivery instructions..."></textarea>
+</div>
+</div>
+</div>
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 md:p-0 bg-white md:bg-transparent border-t md:border-none border-gray-200 z-20 md:mt-8">
+<button class="w-full bg-luxe-dark text-white py-4 md:py-5 rounded-xl md:rounded-2xl font-bold md:text-lg shadow-xl hover:bg-black transition-colors" onclick="proceedToOrderSummary()">Continue to Order Summary</button>
+</div>
+</div>
+</div>
+
+<div class="view-section pt-[72px] overflow-y-auto overflow-x-hidden bg-gray-50" id="view-order-summary">
+<div class="max-w-3xl mx-auto w-full flex flex-col relative pb-24 md:pb-12 pt-0 md:pt-8 min-h-screen">
+<div class="p-4 md:px-0 flex items-center gap-4 bg-white/75 backdrop-blur-xl md:bg-transparent fixed md:static inset-x-0 top-0 z-40 md:mb-6 app-glass md:backdrop-blur-none">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-gray-100 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-2xl md:text-3xl font-bold">Order Summary</h1>
+</div>
+<div class="p-4 md:p-8 md:bg-white md:rounded-3xl md:shadow-sm">
+<!-- Mini Cart items list -->
+<div class="space-y-4 md:space-y-6 mb-8 border-b border-gray-100 pb-8" id="summary-items">
+<!-- Injected by JS -->
+</div>
+<div class="space-y-4 text-sm md:text-base mb-8 border-b border-gray-100 pb-8 bg-gray-50 p-6 rounded-2xl">
+<div class="flex justify-between">
+<span class="text-gray-500">Subtotal</span>
+<span class="font-medium" id="summary-subtotal">₦ 0</span>
+</div>
+<div class="flex justify-between">
+<span class="text-gray-500">Delivery (Kano)</span>
+<span class="font-medium">₦ 3,000</span>
+</div>
+<div class="flex justify-between text-lg md:text-xl font-bold pt-4 border-t border-gray-200 mt-4">
+<span>Total</span>
+<span class="text-luxe-dark" id="summary-total">₦ 0</span>
+</div>
+</div>
+<div>
+<h2 class="font-bold text-lg md:text-xl mb-4">Payment Method</h2>
+<label class="flex items-start gap-4 p-5 border-2 border-luxe-dark rounded-2xl bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition">
+<input checked="" class="mt-1 accent-luxe-dark w-5 h-5 cursor-pointer" name="payment" type="radio"/>
+<div>
+<span class="block font-bold text-base md:text-lg mb-1">Pay on Delivery</span>
+<span class="text-sm text-gray-500">You'll pay with cash or transfer when your order arrives.</span>
+</div>
+</label>
+</div>
+</div>
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 md:p-0 bg-white md:bg-transparent border-t md:border-none border-gray-200 z-20 md:mt-8">
+<button class="w-full bg-luxe-dark text-white py-4 md:py-5 rounded-xl md:rounded-2xl font-bold md:text-lg shadow-xl hover:bg-black transition-colors" onclick="placeOrder()">Place Order</button>
+</div>
+</div>
+</div>
+
+<div class="view-section overflow-y-auto bg-gray-50" id="view-order-confirmation">
+<div class="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[80vh] max-w-2xl mx-auto w-full md:bg-white md:rounded-3xl md:shadow-lg md:my-12 md:p-12">
+<div class="w-24 h-24 md:w-32 md:h-32 bg-green-500 text-white rounded-full flex items-center justify-center text-5xl md:text-6xl mb-8 shadow-[0_0_30px_rgba(34,197,94,0.4)] transform hover:scale-110 transition-transform duration-500">
+<i class="fas fa-check"></i>
+</div>
+<h1 class="font-serif text-3xl md:text-5xl font-bold mb-4 text-luxe-dark">Order Confirmed!</h1>
+<p class="text-base md:text-lg text-gray-500 mb-10 px-4 leading-relaxed max-w-md mx-auto">
+                    Thank you for choosing LuxeScents.<br/>Your order has been received and is being prepared for dispatch.
+                </p>
+<div class="w-full bg-gray-50 rounded-2xl p-6 md:p-8 text-left mb-10 border border-gray-200">
+<div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
+<span class="text-sm md:text-base text-gray-500">Order Number</span>
+<span class="font-bold md:text-lg text-luxe-dark" id="conf-order-number">#LS000123</span>
+</div>
+<div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
+<span class="text-sm md:text-base text-gray-500">Total Amount</span>
+<span class="font-bold md:text-lg text-luxe-dark" id="conf-total">₦ 0</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm md:text-base text-gray-500">Payment Method</span>
+<span class="font-medium text-sm md:text-base text-luxe-dark">Pay on Delivery</span>
+</div>
+</div>
+<div class="w-full flex flex-col sm:flex-row gap-4 justify-center">
+<button class="w-full sm:w-auto px-8 bg-luxe-dark text-white py-4 md:py-5 rounded-xl font-bold md:text-lg shadow-lg hover:bg-black transition-colors" onclick="navigateTo('view-order-tracking')">Track Order</button>
+<button class="w-full sm:w-auto px-8 bg-white text-luxe-dark py-4 md:py-5 rounded-xl font-bold md:text-lg border-2 border-gray-200 hover:border-luxe-dark transition-colors" onclick="resetToHome()">Continue Shopping</button>
+</div>
+</div>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto bg-gray-50 md:bg-white" id="view-wishlist">
+<div class="max-w-screen-2xl mx-auto w-full">
+<div class="p-4 md:px-16 md:py-8 flex justify-between items-center bg-white/75 backdrop-blur-xl md:bg-white fixed md:static inset-x-0 top-0 z-40 border-b border-gray-200 md:border-b-0 app-glass md:backdrop-blur-none">
+<h1 class="font-serif text-2xl md:text-4xl font-bold">My Wishlist</h1>
+<button class="text-red-400 hover:text-red-600 transition-colors flex items-center gap-2 font-medium bg-white md:bg-red-50 px-4 py-2 rounded-full shadow-sm md:shadow-none" onclick="clearWishlist()"><i class="far fa-trash-alt text-lg"></i> <span class="hidden md:inline">Clear All</span></button>
+</div>
+<div class="p-4 md:px-16 md:py-8">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-8" id="wishlist-grid">
+<!-- Populated by JS -->
+</div>
+<div class="hidden flex-col items-center justify-center py-32 text-center md:bg-gray-50 md:rounded-3xl" id="wishlist-empty">
+<div class="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-full flex items-center justify-center text-4xl md:text-6xl text-gray-300 mb-6 mx-auto">
+<i class="far fa-heart"></i>
+</div>
+<h2 class="text-2xl md:text-3xl font-serif font-bold mb-3">Your wishlist is empty</h2>
+<p class="text-gray-500 md:text-lg font-medium mb-8">Save your favorite fragrances here to buy later.</p>
+<button class="bg-luxe-dark text-white px-10 py-4 rounded-full font-bold md:text-lg shadow-lg hover:bg-black transition-colors" onclick="navigateTo('view-categories')">Explore Scents</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto bg-white" id="view-campaign">
+<div class="max-w-screen-2xl mx-auto w-full">
+<div class="p-4 md:px-16 md:py-8 flex items-center gap-4 bg-white/75 backdrop-blur-xl md:bg-white fixed md:static inset-x-0 top-0 z-40 border-b border-gray-100 app-glass md:backdrop-blur-none">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-200 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-xl md:text-3xl font-bold">Collections</h1>
+<button aria-label="View cart" class="relative ml-auto text-xl md:hidden" onclick="navigateTo('view-cart')">
+<i class="fas fa-shopping-bag"></i>
+<span class="cart-badge absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+</button>
+</div>
+<div class="p-4 md:px-16 md:py-8">
+<div class="bg-gradient-to-r from-red-900 to-rose-900 text-white rounded-3xl p-8 md:p-16 relative overflow-hidden mb-10 md:mb-16 shadow-xl h-56 md:h-[400px] flex flex-col justify-center" id="campaign-banner">
+<div class="relative z-10 w-2/3 md:w-1/2">
+<span class="text-xs md:text-sm font-bold tracking-widest text-rose-300 uppercase mb-2 block" id="campaign-badge">Limited Edition</span>
+<h2 class="font-serif text-3xl md:text-6xl font-bold mb-4 md:mb-6" id="campaign-title">Valentine's Collection</h2>
+<p class="text-sm md:text-xl text-red-100 mb-6 md:mb-10 leading-relaxed max-w-md" id="campaign-subtitle">Curated special scents designed to make your most intimate moments unforgettable.</p>
+<button class="bg-white text-red-900 px-6 py-3 md:px-10 md:py-4 rounded-full text-sm md:text-lg font-bold w-max hover:bg-rose-50 transition transform hover:scale-105 shadow-lg" onclick="document.getElementById('campaign-grid').scrollIntoView({behavior:'smooth', block:'start'})">Shop The Collection <i class="fas fa-arrow-right ml-2"></i></button>
+</div>
+<img alt="" class="absolute -right-10 md:right-0 top-0 bottom-0 h-full w-1/2 object-cover mix-blend-screen opacity-60 md:opacity-80" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&amp;fit=crop&amp;w=800&amp;q=80'" src="https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&amp;fit=crop&amp;w=1000"/>
+</div>
+<div class="flex md:justify-center gap-3 md:gap-4 overflow-x-auto md:overflow-visible no-scrollbar pb-4 mb-8 md:mb-16" id="campaign-filter-chips"></div>
+<h3 class="font-bold text-2xl md:text-3xl font-serif mb-6 md:mb-8 text-center md:text-left" id="campaign-grid-heading">Romantic Picks</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8" id="campaign-grid">
+<!-- Populated by JS -->
+</div>
+<div class="hidden flex-col items-center justify-center py-20 text-center" id="campaign-empty-state">
+<div class="w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-full flex items-center justify-center text-3xl md:text-4xl text-gray-300 mb-5 mx-auto">
+<i class="fas fa-gift"></i>
+</div>
+<h4 class="text-xl md:text-2xl font-serif font-bold mb-2">Nothing here yet</h4>
+<p class="text-gray-500 md:text-lg">Check back soon for this selection.</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto bg-gray-50" id="view-account">
+<div class="max-w-4xl mx-auto w-full md:pt-12">
+<div class="p-4 md:hidden bg-white/75 backdrop-blur-xl fixed top-0 inset-x-0 z-40 border-b border-gray-200 app-glass">
+<h1 class="font-serif text-2xl font-bold">My Account</h1>
+</div>
+<div class="p-4 md:p-8">
+<div class="flex items-center gap-6 mb-10 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+<div class="w-20 h-20 md:w-28 md:h-28 bg-gray-100 rounded-full flex items-center justify-center text-3xl md:text-5xl text-gray-400 overflow-hidden shadow-inner border-4 border-white">
+<i class="fas fa-user"></i>
+</div>
+<div class="min-w-0">
+<h2 class="font-serif font-bold text-2xl md:text-3xl mb-1 truncate" id="acct-display-name">Jane Doe</h2>
+<p class="text-sm md:text-base text-gray-500 mb-2 truncate" id="acct-display-email">jane@example.com</p>
+<span class="inline-block bg-luxe-dark text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Gold Member</span>
+</div>
+</div>
+<!-- ACCOUNT -->
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 px-1">Account</h3>
+<div class="grid md:grid-cols-2 gap-4 md:gap-6 mb-10">
+<button class="flex items-center justify-between p-5 md:p-6 bg-white rounded-2xl hover:shadow-md border border-gray-100 transition group" onclick="openProfileModal()">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark group-hover:bg-luxe-dark group-hover:text-white transition-colors">
+<i class="fas fa-id-card text-xl"></i>
+</div>
+<span class="font-bold text-base md:text-lg">Profile Information</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 group-hover:text-luxe-dark transition"></i>
+</button>
+<button class="flex items-center justify-between p-5 md:p-6 bg-white rounded-2xl hover:shadow-md border border-gray-100 transition group" onclick="openAddressesModal()">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark group-hover:bg-luxe-dark group-hover:text-white transition-colors">
+<i class="fas fa-map-marker-alt text-xl"></i>
+</div>
+<span class="font-bold text-base md:text-lg">Addresses</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 group-hover:text-luxe-dark transition"></i>
+</button>
+<button class="flex items-center justify-between p-5 md:p-6 bg-white rounded-2xl hover:shadow-md border border-gray-100 transition group" onclick="navigateTo('view-order-history')">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark group-hover:bg-luxe-dark group-hover:text-white transition-colors">
+<i class="fas fa-box text-xl"></i>
+</div>
+<span class="font-bold text-base md:text-lg">Order History</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 group-hover:text-luxe-dark transition"></i>
+</button>
+<button class="flex items-center justify-between p-5 md:p-6 bg-white rounded-2xl hover:shadow-md border border-gray-100 transition group" onclick="navigateTo('view-wishlist')">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark group-hover:bg-red-500 group-hover:text-white transition-colors">
+<i class="far fa-heart text-xl"></i>
+</div>
+<span class="font-bold text-base md:text-lg">Wishlist</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 group-hover:text-luxe-dark transition"></i>
+</button>
+<button class="flex items-center justify-between p-5 md:p-6 bg-white rounded-2xl hover:shadow-md border border-gray-100 transition group" onclick="openChangePasswordModal()">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark group-hover:bg-luxe-dark group-hover:text-white transition-colors">
+<i class="fas fa-lock text-xl"></i>
+</div>
+<span class="font-bold text-base md:text-lg">Change Password</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 group-hover:text-luxe-dark transition"></i>
+</button>
+
+</div>
+<!-- SETTINGS -->
+<h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 px-1">Settings</h3>
+<div class="bg-white rounded-2xl border border-gray-100 divide-y divide-gray-100 overflow-hidden shadow-sm">
+<div class="flex items-center justify-between p-4 md:p-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-bell text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Order Updates</span>
+</div>
+<button aria-checked="false" aria-label="Order Updates" class="settings-toggle relative w-12 h-7 rounded-full transition-colors flex-shrink-0 bg-gray-200" id="toggle-orderUpdates" data-setting="orderUpdates" role="switch" type="button">
+<span class="toggle-knob absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform"></span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 md:p-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-envelope text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Email Notifications</span>
+</div>
+<button aria-checked="false" aria-label="Email Notifications" class="settings-toggle relative w-12 h-7 rounded-full transition-colors flex-shrink-0 bg-gray-200" id="toggle-emailNotifications" data-setting="emailNotifications" role="switch" type="button">
+<span class="toggle-knob absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform"></span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 md:p-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-volume-high text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Sound</span>
+</div>
+<button aria-checked="false" aria-label="Sound" class="settings-toggle relative w-12 h-7 rounded-full transition-colors flex-shrink-0 bg-gray-200" id="toggle-sound" data-setting="sound" role="switch" type="button">
+<span class="toggle-knob absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform"></span>
+</button>
+</div>
+<div class="flex items-center justify-between p-4 md:p-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-mobile-screen-button text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Haptic</span>
+</div>
+<button aria-checked="false" aria-label="Haptic" class="settings-toggle relative w-12 h-7 rounded-full transition-colors flex-shrink-0 bg-gray-200" id="toggle-haptic" data-setting="haptic" role="switch" type="button">
+<span class="toggle-knob absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform"></span>
+</button>
+</div>
+<button class="w-full flex items-center justify-between p-4 md:p-5 hover:bg-gray-50 transition text-left" onclick="openInfoModal('about')">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-circle-info text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">About Us</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+</button>
+<button class="w-full flex items-center justify-between p-4 md:p-5 hover:bg-gray-50 transition text-left" onclick="openInfoModal('faq')">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-circle-question text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">FAQ</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+</button>
+<button class="w-full flex items-center justify-between p-4 md:p-5 hover:bg-gray-50 transition text-left" onclick="openInfoModal('terms')">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-file-contract text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Terms &amp; Conditions</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+</button>
+<button class="w-full flex items-center justify-between p-4 md:p-5 hover:bg-gray-50 transition text-left" onclick="openInfoModal('refund')">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-receipt text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Refund &amp; Returns</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+</button>
+<button class="w-full flex items-center justify-between p-4 md:p-5 hover:bg-gray-50 transition text-left" onclick="openInfoModal('delivery')">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-luxe-dark flex-shrink-0"><i class="fas fa-truck text-base"></i></div>
+<span class="font-semibold text-sm md:text-base">Order &amp; Delivery Policy</span>
+</div>
+<i class="fas fa-chevron-right text-gray-400 text-sm"></i>
+</button>
+<button class="w-full flex items-center justify-between p-4 md:p-5 hover:bg-red-50 transition text-left group" onclick="openSignOutConfirm()">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition-colors flex-shrink-0"><i class="fas fa-sign-out-alt text-base"></i></div>
+<span class="font-semibold text-sm md:text-base text-red-600">Sign Out</span>
+</div>
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto bg-gray-50" id="view-order-history">
+<div class="max-w-3xl mx-auto w-full md:pt-12">
+<div class="p-4 md:px-0 flex items-center gap-4 bg-white/75 backdrop-blur-xl md:bg-transparent fixed md:static inset-x-0 top-0 z-40 md:mb-6 app-glass md:backdrop-blur-none border-b border-gray-100 md:border-none">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-gray-100 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-2xl md:text-3xl font-bold">Order History</h1>
+</div>
+<div class="p-4 md:p-0">
+<div class="space-y-4" id="order-history-list">
+<!-- Populated by JS -->
+</div>
+<div class="hidden flex-col items-center justify-center text-center py-20" id="order-history-empty">
+<div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center text-4xl text-gray-300 mb-6 mx-auto">
+<i class="fas fa-box"></i>
+</div>
+<h2 class="text-2xl font-serif font-bold mb-3">No orders yet</h2>
+<p class="text-gray-500 mb-8 max-w-md mx-auto">Orders you place at checkout will show up here.</p>
+<button class="bg-luxe-dark text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-black transition-colors" onclick="navigateTo('view-home')">Start Shopping</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="view-section pb-20 md:pb-12 pt-[72px] overflow-y-auto bg-gray-50" id="view-order-tracking">
+<div class="max-w-3xl mx-auto w-full md:pt-12">
+<div class="p-4 md:px-0 flex items-center gap-4 bg-white/75 backdrop-blur-xl md:bg-transparent fixed md:static inset-x-0 top-0 z-40 border-b border-gray-200 md:border-none md:mb-6 app-glass md:backdrop-blur-none">
+<button aria-label="Go back" class="text-lg w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center hover:bg-gray-200 transition" onclick="goBack()"><i class="fas fa-chevron-left"></i></button>
+<h1 class="font-serif text-2xl md:text-3xl font-bold">Order Tracking</h1>
+</div>
+<div class="p-4 md:p-8 md:bg-white md:rounded-3xl md:shadow-sm" id="order-tracking-content">
+<div class="mb-8 pb-6 border-b border-gray-100">
+<div class="flex justify-between items-start mb-2">
+<h2 class="font-bold text-lg md:text-xl">Order <span id="track-order-number">#LS000123</span></h2>
+<span class="bg-green-100 text-green-700 text-xs md:text-sm font-bold px-3 py-1 rounded-full" id="track-status-badge">Processing</span>
+</div>
+<p class="text-sm md:text-base text-gray-500">Placed on <span id="track-order-date">Oct 26, 2026</span> • <span class="font-bold text-luxe-dark" id="track-total">₦ 258,000</span></p>
+</div>
+<!-- Timeline -->
+<div class="flex items-center justify-between mb-12 relative px-2 md:px-8 mt-10">
+<div class="absolute top-4 md:top-5 left-8 right-8 h-[3px] bg-gray-200 -z-10 rounded-full"></div>
+<div class="absolute top-4 md:top-5 left-8 w-1/3 h-[3px] bg-green-500 -z-10 rounded-full"></div>
+<div class="flex flex-col items-center gap-3 w-1/4">
+<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-sm md:text-base shadow-md"><i class="fas fa-check"></i></div>
+<span class="text-[10px] md:text-xs font-bold text-green-600 text-center uppercase tracking-wider">Confirmed</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-1/4">
+<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 text-white flex items-center justify-center text-sm md:text-base shadow-md animate-pulse"><i class="fas fa-sync-alt"></i></div>
+<span class="text-[10px] md:text-xs font-bold text-green-600 text-center uppercase tracking-wider">Processing</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-1/4">
+<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border-4 border-gray-200 text-gray-300 flex items-center justify-center text-sm md:text-base"><i class="fas fa-truck"></i></div>
+<span class="text-[10px] md:text-xs font-bold text-gray-400 text-center uppercase tracking-wider">Shipped</span>
+</div>
+<div class="flex flex-col items-center gap-3 w-1/4">
+<div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border-4 border-gray-200 text-gray-300 flex items-center justify-center text-sm md:text-base"><i class="fas fa-box-open"></i></div>
+<span class="text-[10px] md:text-xs font-bold text-gray-400 text-center uppercase tracking-wider">Delivered</span>
+</div>
+</div>
+<h3 class="font-bold text-lg mb-4">Purchased Items (<span id="track-count">0</span>)</h3>
+<div class="space-y-4 md:space-y-6" id="track-items">
+<!-- Injected by JS -->
+</div>
+</div>
+<div class="hidden flex-col items-center justify-center py-20 px-6 text-center md:bg-white md:rounded-3xl md:shadow-sm" id="order-tracking-empty">
+<div class="w-24 h-24 md:w-28 md:h-28 bg-gray-100 rounded-full flex items-center justify-center text-4xl md:text-5xl text-gray-300 mb-6 mx-auto">
+<i class="fas fa-box"></i>
+</div>
+<h2 class="text-2xl md:text-3xl font-serif font-bold mb-3">No orders yet</h2>
+<p class="text-gray-500 mb-8 md:text-lg max-w-md mx-auto">Once you place an order, you'll be able to track it here.</p>
+<button class="bg-luxe-dark text-white px-8 md:px-12 py-4 rounded-full font-bold md:text-lg shadow-lg hover:bg-black transition-colors" onclick="navigateTo('view-home')">Start Shopping</button>
+</div>
+</div>
+</div>
+
+<div class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 flex justify-around px-2 py-3 pb-6 text-[10px] text-gray-400 font-medium z-40 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]" id="bottom-nav">
+<button class="nav-mob-btn flex flex-col items-center gap-1 w-16 text-luxe-dark transition-colors" data-target="view-home" onclick="navigateTo('view-home')">
+<i class="fas fa-home text-xl md:text-2xl mb-1"></i> Home
+            </button>
+<button class="nav-mob-btn flex flex-col items-center gap-1 w-16 transition-colors" data-target="view-categories" onclick="navigateTo('view-categories')">
+<i class="fas fa-search text-xl md:text-2xl mb-1"></i> Shop
+            </button>
+<button class="nav-mob-btn flex flex-col items-center gap-1 w-16 transition-colors" data-target="view-wishlist" onclick="navigateTo('view-wishlist')">
+<i class="far fa-heart text-xl md:text-2xl mb-1"></i> Wishlist
+            </button>
+<button class="nav-mob-btn flex flex-col items-center gap-1 w-16 transition-colors" data-target="view-account" onclick="navigateTo('view-account')">
+<i class="far fa-user text-xl md:text-2xl mb-1"></i> Account
+            </button>
+</div>
+    </div>
+    <!-- Ordered classic scripts keep the existing inline event handlers compatible. -->
+    <script src="js/01-data.js"></script>
+    <script src="js/02-state.js"></script>
+    <script src="js/03-storage.js"></script>
+    <script src="js/04-utils.js"></script>
+    <script src="js/05-navigation.js"></script>
+    <script src="js/06-modals.js"></script>
+    <script src="js/07-catalog-rendering.js"></script>
+    <script src="js/08-search.js"></script>
+    <script src="js/09-filters.js"></script>
+    <script src="js/10-product-details.js"></script>
+    <script src="js/11-wishlist.js"></script>
+    <script src="js/12-cart.js"></script>
+    <script src="js/13-checkout.js"></script>
+    <script src="js/14-orders.js"></script>
+    <script src="js/15-account-settings.js"></script>
+    <script src="js/16-campaign.js"></script>
+    <script src="js/18-init-storefront.js"></script>
+</body>
+</html>

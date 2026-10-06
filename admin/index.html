@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LuxeScents Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/00-tailwind-config.js"></script>
+    <link rel="stylesheet" href="../css/00-base.css">
+    <link rel="stylesheet" href="../css/01-ui.css">
+    <link rel="stylesheet" href="../css/02-app-chrome.css">
+    <link rel="stylesheet" href="../css/03-dashboard.css">
+    <link rel="stylesheet" href="../css/04-admin-theme.css">
+    <link rel="stylesheet" href="../css/05-settings.css">
+</head>
+<body class="admin-page text-luxe-dark antialiased">
+    <div id="app-container">
+<div class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-luxe-dark text-white px-6 py-3 rounded-full shadow-lg z-[100] text-sm hidden transition-opacity duration-300" id="toast">
+            Added to wishlist
+        </div>
+
+<div class="modal fixed inset-0 z-[70] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-promotion">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto no-scrollbar pb-24 md:pb-6 relative shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold" id="promo-modal-heading">New Promotion</h2>
+<button aria-label="Close promotion editor" class="p-2 hover:bg-gray-100 rounded-full transition" onclick="closeModal('modal-promotion')"><i class="fas fa-times text-xl"></i></button>
+</div>
+<input id="promo-form-id" type="hidden" value=""/>
+<div class="mb-5">
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="promo-form-title">Promotion Title</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="promo-form-title" placeholder="e.g. Valentine's Collection" type="text"/>
+</div>
+<div class="mb-5">
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="promo-form-badge">Badge Label</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="promo-form-badge" placeholder="e.g. Limited Edition" type="text"/>
+</div>
+<div class="mb-5">
+<label class="block text-xs md:text-sm font-medium text-gray-700 mb-2" for="promo-form-subtitle">Description</label>
+<textarea class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm md:text-base h-20 resize-none focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="promo-form-subtitle" placeholder="Short description shown on the Collections banner"></textarea>
+</div>
+<div class="mb-5">
+<h3 class="font-semibold mb-3 text-sm md:text-base">Target Categories &amp; Collections</h3>
+<div class="flex flex-wrap gap-2" id="promo-form-targets">
+<!-- Populated by JS: one toggle chip per category/collection -->
+</div>
+</div>
+<div class="mb-6">
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-gray-700">
+<input checked="" class="accent-luxe-dark w-4 h-4 cursor-pointer" id="promo-form-enabled" type="checkbox"/> Promotion enabled (visible in Collections)
+                    </label>
+</div>
+<div class="fixed md:static bottom-0 left-0 right-0 p-4 bg-white border-t md:border-none border-gray-100 md:p-0 md:mt-8 flex gap-3">
+<button class="flex-1 bg-gray-100 hover:bg-gray-200 text-luxe-dark py-4 rounded-xl font-semibold transition-colors" onclick="closeModal('modal-promotion')">Cancel</button>
+<button class="flex-1 bg-luxe-dark text-white py-4 rounded-xl font-semibold hover:bg-black transition-colors shadow-md" onclick="savePromotionForm()">Save Promotion</button>
+</div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[80] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-product-admin">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-2xl mx-auto max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
+<div class="flex items-center justify-between mb-6"><h2 class="text-xl font-bold" id="product-admin-heading">Add Product</h2><button aria-label="Close" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center" onclick="closeModal('modal-product-admin')" type="button"><i class="fas fa-times"></i></button></div>
+<input id="product-admin-id" type="hidden"/>
+<div class="grid md:grid-cols-2 gap-4">
+<div><label class="block text-xs font-medium text-gray-700 mb-2">Product Name</label><input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-name"/></div>
+<div><label class="block text-xs font-medium text-gray-700 mb-2">Brand</label><input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-brand"/></div>
+<div><label class="block text-xs font-medium text-gray-700 mb-2">Price (₦)</label><input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-price" min="0" type="number"/></div>
+<div><label class="block text-xs font-medium text-gray-700 mb-2">Image URL</label><input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-image"/></div>
+<div><label class="block text-xs font-medium text-gray-700 mb-2">Background class</label><input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-bg" placeholder="bg-gray-100"/></div>
+<div><label class="block text-xs font-medium text-gray-700 mb-2">Sizes</label><input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-sizes" placeholder="100ml, 50ml"/></div>
+</div>
+<div class="grid md:grid-cols-2 gap-5 mt-5">
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2">Categories</label>
+<div class="admin-picker" id="product-admin-categories-picker"></div>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2">Collections</label>
+<div class="admin-picker" id="product-admin-collections-picker"></div>
+</div>
+</div>
+<div class="mt-5">
+<label class="block text-xs font-medium text-gray-700 mb-2">Labels</label>
+<p class="text-[11px] text-gray-400 mb-2">Choose the labels that should appear on this product.</p>
+<div class="admin-picker" id="product-admin-labels-picker"></div>
+</div>
+<div class="mt-5">
+<label class="block text-xs font-medium text-gray-700 mb-2">Tags</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-tags" placeholder="Floral, Fresh"/>
+</div>
+<div class="mt-4"><label class="block text-xs font-medium text-gray-700 mb-2">Description</label><textarea class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="product-admin-desc" rows="4"></textarea></div>
+<label class="flex items-center gap-2 mt-4 text-sm"><input class="accent-luxe-dark w-4 h-4" id="product-admin-stock" type="checkbox"/> In Stock</label>
+<div class="flex gap-3 mt-6"><button class="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl font-semibold" onclick="closeModal('modal-product-admin')" type="button">Cancel</button><button class="flex-1 bg-luxe-dark text-white hover:bg-black py-3 rounded-xl font-semibold" onclick="saveProductAdminForm()" type="button">Save Product</button></div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[80] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-category-admin">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-md mx-auto shadow-2xl">
+<div class="flex items-center justify-between mb-6"><h2 class="text-xl font-bold" id="category-admin-heading">Add Category</h2><button aria-label="Close" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center" onclick="closeModal('modal-category-admin')" type="button"><i class="fas fa-times"></i></button></div>
+<input id="category-admin-key" type="hidden"/>
+<label class="block text-xs font-medium text-gray-700 mb-2">Category Name</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="category-admin-name" placeholder="e.g. Arabic"/>
+<label class="block text-xs font-medium text-gray-700 mb-2 mt-4">Description</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="category-admin-description" placeholder="Optional short description"/>
+<label class="flex items-center gap-2 mt-4 text-sm cursor-pointer"><input class="accent-luxe-dark w-4 h-4" id="category-admin-active" type="checkbox" checked/> Active</label>
+<div class="flex gap-3 mt-6"><button class="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl font-semibold" onclick="closeModal('modal-category-admin')" type="button">Cancel</button><button class="flex-1 bg-luxe-dark text-white hover:bg-black py-3 rounded-xl font-semibold" onclick="saveCategoryAdminForm()" type="button">Save Category</button></div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[80] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-collection-admin">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-md mx-auto shadow-2xl">
+<div class="flex items-center justify-between mb-6"><h2 class="text-xl font-bold" id="collection-admin-heading">Add Collection</h2><button aria-label="Close" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center" onclick="closeModal('modal-collection-admin')" type="button"><i class="fas fa-times"></i></button></div>
+<input id="collection-admin-key" type="hidden"/>
+<label class="block text-xs font-medium text-gray-700 mb-2">Collection Name</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="collection-admin-name" placeholder="e.g. New Arrivals"/>
+<label class="block text-xs font-medium text-gray-700 mb-2 mt-4">Description</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="collection-admin-description" placeholder="Optional short description"/>
+<label class="flex items-center gap-2 mt-4 text-sm cursor-pointer"><input class="accent-luxe-dark w-4 h-4" id="collection-admin-active" type="checkbox" checked/> Active</label>
+<div class="flex gap-3 mt-6"><button class="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl font-semibold" onclick="closeModal('modal-collection-admin')" type="button">Cancel</button><button class="flex-1 bg-luxe-dark text-white hover:bg-black py-3 rounded-xl font-semibold" onclick="saveCollectionAdminForm()" type="button">Save Collection</button></div>
+</div>
+</div>
+
+<div class="modal fixed inset-0 z-[80] bg-black bg-opacity-50 flex-col justify-end md:justify-center md:items-center hidden p-4" id="modal-label-admin">
+<div class="modal-content bg-white rounded-t-3xl md:rounded-3xl p-6 w-full md:max-w-md mx-auto shadow-2xl">
+<div class="flex items-center justify-between mb-6"><h2 class="text-xl font-bold" id="label-admin-heading">Add Label</h2><button aria-label="Close" class="w-9 h-9 rounded-full hover:bg-gray-100 flex items-center justify-center" onclick="closeModal('modal-label-admin')" type="button"><i class="fas fa-times"></i></button></div>
+<input id="label-admin-key" type="hidden"/>
+<label class="block text-xs font-medium text-gray-700 mb-2">Label Name</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm" id="label-admin-name" placeholder="e.g. Limited Edition"/>
+<div class="flex gap-3 mt-6"><button class="flex-1 bg-gray-100 hover:bg-gray-200 py-3 rounded-xl font-semibold" onclick="closeModal('modal-label-admin')" type="button">Cancel</button><button class="flex-1 bg-luxe-dark text-white hover:bg-black py-3 rounded-xl font-semibold" onclick="saveLabelAdminForm()" type="button">Save Label</button></div>
+</div>
+</div>
+
+<div class="view-section active pb-20 md:pb-12 pt-[72px] overflow-y-auto bg-gray-50" id="view-dashboard">
+<div class="admin-dashboard-frame">
+<div class="admin-page-header">
+<h1 class="font-serif text-2xl md:text-3xl font-bold" id="admin-page-title">Dashboard</h1>
+</div>
+<div class="admin-dashboard-workspace">
+<div class="dashboard-mobile-menu items-center justify-between gap-3 mb-4">
+<button aria-label="Open dashboard menu" class="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center" onclick="toggleDashboardSidebar()" type="button"><i class="fas fa-bars"></i></button>
+<span class="font-semibold text-sm text-gray-500">Dashboard Menu</span>
+<button class="text-xs font-semibold px-3 py-2 rounded-full bg-white border border-gray-200" onclick="switchDashboardTab('overview')" type="button">Dashboard</button>
+</div>
+<div class="dashboard-drawer-backdrop" id="dashboard-drawer-backdrop" onclick="toggleDashboardSidebar(false)"></div>
+<div class="dashboard-shell">
+<aside aria-label="Dashboard navigation" class="dashboard-sidebar" id="dashboard-sidebar">
+<div class="dashboard-sidebar-mobile-close">
+<button aria-label="Close dashboard menu" class="md:hidden w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center" onclick="toggleDashboardSidebar(false)" type="button"><i class="fas fa-times"></i></button>
+</div>
+<div class="dashboard-sidebar-nav" aria-label="Dashboard sections" role="tablist">
+<button aria-selected="true" class="dash-side-btn" data-tab="overview" onclick="switchDashboardTab('overview')" role="tab" type="button"><i class="fas fa-chart-pie w-5 text-center"></i><span>Dashboard</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="catalog" onclick="switchDashboardTab('catalog')" role="tab" type="button"><i class="fas fa-box w-5 text-center"></i><span>Products</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="categories" onclick="switchDashboardTab('categories')" role="tab" type="button"><i class="fas fa-tags w-5 text-center"></i><span>Categories</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="labels" onclick="switchDashboardTab('labels')" role="tab" type="button"><i class="fas fa-bookmark w-5 text-center"></i><span>Labels</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="promotions" onclick="switchDashboardTab('promotions')" role="tab" type="button"><i class="fas fa-bullhorn w-5 text-center"></i><span>Promotions</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="zones" onclick="switchDashboardTab('zones')" role="tab" type="button"><i class="fas fa-truck w-5 text-center"></i><span>Delivery Zones</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="orders" onclick="switchDashboardTab('orders')" role="tab" type="button"><i class="fas fa-receipt w-5 text-center"></i><span>Orders</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="customers" onclick="switchDashboardTab('customers')" role="tab" type="button"><i class="fas fa-users w-5 text-center"></i><span>Customers</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="analytics" onclick="switchDashboardTab('analytics')" role="tab" type="button"><i class="fas fa-chart-line w-5 text-center"></i><span>Analytics</span></button>
+<button aria-selected="false" class="dash-side-btn" data-tab="settings" onclick="switchDashboardTab('settings')" role="tab" type="button"><i class="fas fa-cog w-5 text-center"></i><span>Settings</span></button>
+</div>
+<div class="dashboard-sidebar-footer">
+<button class="dashboard-logout-btn" onclick="adminLogout()" type="button"><i class="fas fa-arrow-right-from-bracket"></i><span>Logout</span></button>
+</div>
+</aside>
+<main class="dashboard-content">
+<!-- Dashboard (overview) panel -->
+<div class="dash-panel" id="dash-panel-overview">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<div class="text-2xl md:text-3xl font-bold" id="dash-stat-products">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Total Products</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<div class="text-2xl md:text-3xl font-bold" id="dash-stat-categories">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Categories</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<div class="text-2xl md:text-3xl font-bold" id="dash-stat-promos">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Active Promotions</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<div class="text-2xl md:text-3xl font-bold" id="dash-stat-orders">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Orders</div>
+</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<h3 class="font-bold mb-2">About this dashboard</h3>
+<p class="text-sm text-gray-500 leading-relaxed">Featured-product selections, labels and promotions are managed here and saved in this browser.</p>
+</div>
+</div>
+<!-- Products panel -->
+<div class="dash-panel hidden" id="dash-panel-catalog">
+<div class="flex items-center justify-between gap-3 mb-4">
+<h3 class="font-bold text-lg">Products</h3>
+<button class="bg-luxe-dark text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition whitespace-nowrap" onclick="openProductAdminModal()" type="button"><i class="fas fa-plus mr-1"></i> Add Product</button>
+</div>
+<div class="relative mb-5">
+<i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="dash-product-search" oninput="renderDashboardCatalog()" placeholder="Search products by name or brand…" type="text"/>
+</div>
+<div class="flex flex-wrap gap-2 mb-6" id="dash-category-chips"></div>
+<div class="space-y-3" id="dash-catalog-list"></div>
+</div>
+<!-- Categories panel -->
+<div class="dash-panel hidden" id="dash-panel-categories">
+<div class="flex items-center justify-between gap-3 mb-1">
+<div><h3 class="font-bold text-lg">Categories</h3><p class="text-sm text-gray-500">Manage the categories available across the storefront.</p></div>
+<button class="bg-luxe-dark text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition whitespace-nowrap" onclick="openCategoryModal()" type="button"><i class="fas fa-plus mr-1"></i> Add Category</button>
+</div>
+<div class="mt-5 relative max-w-sm">
+<i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="dash-category-search" oninput="renderDashboardCategories()" placeholder="Search categories…" type="text"/>
+</div>
+<div class="admin-data-list mt-4" id="dash-categories-grid"></div>
+<div class="flex items-center justify-between gap-3 mt-10 mb-1">
+<div><h3 class="font-bold text-lg">Collections</h3><p class="text-sm text-gray-500">Manage collection names and product membership.</p></div>
+<button class="bg-luxe-dark text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition whitespace-nowrap" onclick="openCollectionModal()" type="button"><i class="fas fa-plus mr-1"></i> Add Collection</button>
+</div>
+<div class="admin-data-list mt-4" id="dash-collections-grid"></div>
+</div>
+<!-- Labels panel -->
+<div class="dash-panel hidden" id="dash-panel-labels">
+<div class="flex items-center justify-between gap-3 mb-1">
+<div><h3 class="font-bold text-lg">Labels</h3><p class="text-sm text-gray-500">Create and manage reusable product labels. Labels are assigned from the product editor.</p></div>
+<button class="bg-luxe-dark text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition whitespace-nowrap" onclick="openLabelModal()" type="button"><i class="fas fa-plus mr-1"></i> Add Label</button>
+</div>
+<div class="admin-data-list mt-5" id="dash-labels-list"></div>
+</div>
+<!-- Promotions panel -->
+<div class="dash-panel hidden" id="dash-panel-promotions">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-lg">All Promotions</h3>
+<button class="bg-luxe-dark text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition whitespace-nowrap" onclick="openPromotionModal()"><i class="fas fa-plus mr-1"></i> New</button>
+</div>
+<div class="space-y-4" id="dash-promotions-list">
+<!-- Populated by JS -->
+</div>
+</div>
+<!-- Delivery Zones panel -->
+<div class="dash-panel hidden" id="dash-panel-zones">
+<div class="flex justify-between items-center mb-2 gap-3">
+<h3 class="font-bold text-lg">Delivery Zones</h3>
+<button class="bg-luxe-dark text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition whitespace-nowrap flex-shrink-0" onclick="openZoneForm()"><i class="fas fa-plus mr-1"></i> New Zone</button>
+</div>
+<p class="text-xs text-gray-500 mb-6">Delivery zone fees are managed here for the store.</p>
+<div class="hidden bg-gray-50 border border-gray-200 rounded-2xl p-4 md:p-5 mb-6" id="zone-form">
+<input id="zone-form-id" type="hidden" value=""/>
+<div class="grid sm:grid-cols-2 gap-4 mb-4">
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2" for="zone-form-name">Zone Name</label>
+<input class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxe-dark transition" id="zone-form-name" placeholder="e.g. Ibadan" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2" for="zone-form-fee">Delivery Fee (₦)</label>
+<input class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxe-dark transition" id="zone-form-fee" min="0" placeholder="3000" step="100" type="number"/>
+</div>
+</div>
+<label class="flex items-center gap-2 text-sm cursor-pointer mb-4">
+<input checked="" class="accent-luxe-dark w-4 h-4 cursor-pointer" id="zone-form-active" type="checkbox"/> Active
+                            </label>
+<div class="flex gap-3">
+<button class="flex-1 bg-gray-100 hover:bg-gray-200 text-luxe-dark py-3 rounded-xl text-sm font-semibold transition" onclick="closeZoneForm()">Cancel</button>
+<button class="flex-1 bg-luxe-dark text-white py-3 rounded-xl text-sm font-semibold hover:bg-black transition" onclick="saveZoneForm()">Save Zone</button>
+</div>
+</div>
+<div class="space-y-3" id="dash-zones-list"></div>
+</div>
+<!-- Orders panel -->
+<div class="dash-panel hidden" id="dash-panel-orders">
+<h3 class="font-bold text-lg mb-6">Orders</h3>
+<div class="space-y-3" id="dash-orders-list"></div>
+</div>
+<!-- Customers panel -->
+<div class="dash-panel hidden" id="dash-panel-customers">
+<h3 class="font-bold text-lg mb-1">Customers</h3>
+<p class="text-sm text-gray-500 mb-6">Customer records are derived from the available order history.</p>
+<div class="space-y-3" id="dash-customers-list"></div>
+</div>
+<!-- Analytics panel -->
+<div class="dash-panel hidden" id="dash-panel-analytics">
+<h3 class="font-bold text-lg mb-6">Analytics</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+<div class="text-2xl md:text-3xl font-bold" id="an-total-orders">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Total Orders</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+<div class="text-xl md:text-2xl font-bold truncate" id="an-revenue">₦ 0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Revenue</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+<div class="text-2xl md:text-3xl font-bold" id="an-products-sold">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Products Sold</div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+<div class="text-2xl md:text-3xl font-bold" id="an-customers">0</div>
+<div class="text-xs md:text-sm text-gray-500 mt-1">Customers</div>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<h4 class="font-bold mb-4 text-sm md:text-base">Best-Selling Products</h4>
+<div class="space-y-3" id="an-bestsellers"></div>
+</div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6">
+<h4 class="font-bold mb-4 text-sm md:text-base">Order Status Breakdown</h4>
+<div class="space-y-3" id="an-status-breakdown"></div>
+</div>
+</div>
+</div>
+<!-- Settings panel -->
+<div class="dash-panel hidden" id="dash-panel-settings">
+<h3 class="font-bold text-lg mb-1">Store Settings</h3>
+<p class="text-sm text-gray-500 mb-6">Store settings are saved locally and used by the storefront.</p>
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 space-y-5 max-w-xl">
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2" for="admin-support-email">Support Email</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="admin-support-email" type="email"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2" for="admin-support-phone">Support Phone</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="admin-support-phone" type="tel"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-2" for="admin-return-window">Return Window (days)</label>
+<input class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-luxe-dark focus:bg-white transition" id="admin-return-window" min="0" type="number"/>
+</div>
+<button class="bg-luxe-dark text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-black transition" onclick="saveAdminSettings()">Save Settings</button>
+</div>
+</div>
+</main>
+</div>
+</div>
+</div>
+</div>
+    </div>
+    <!-- Admin loads the same shared data/state/storage layer, then the dashboard module. -->
+    <script src="../js/01-data.js"></script>
+    <script src="../js/02-state.js"></script>
+    <script src="../js/03-storage.js"></script>
+    <script src="../js/04-utils.js"></script>
+    <script src="../js/06-modals.js"></script>
+    <script src="../js/07-catalog-rendering.js"></script>
+    <script src="../js/12-cart.js"></script>
+    <script src="../js/15-account-settings.js"></script>
+    <script src="../js/17-dashboard.js"></script>
+    <script src="../js/18-init-admin.js"></script>
+</body>
+</html>

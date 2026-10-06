@@ -1,0 +1,47 @@
+/* ================================================================
+   BASE / APP SHELL
+   ================================================================ */
+/* ================================================================
+           BASE / RESET
+           ================================================================ */
+        body {
+            background-color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ================================================================
+           APP SHELL / LAYOUT
+           ================================================================ */
+        #app-container {
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        
+/* ================================================================
+           APP SHELL / LAYOUT
+           ================================================================ */
+        #app-container {
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
